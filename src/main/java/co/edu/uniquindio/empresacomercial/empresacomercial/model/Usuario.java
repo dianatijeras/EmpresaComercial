@@ -58,4 +58,22 @@ public class Usuario {
     public void setTipoUsuario(TipoUsuario tipoUsuario) {
         this.tipoUsuario = tipoUsuario;
     }
+
+    /**
+     * Los permisos los define el tipo de usuario, aqui solo se pregunta
+     * @return
+     */
+
+
+    public boolean puedeCrearUsuario() {
+        return tipoUsuario != null && tipoUsuario.puedeCrearUsuario();
+    }
+
+    public boolean puedeModificarDatos() {
+        return tipoUsuario != null && tipoUsuario.puedeModificarDatos();
+    }
+
+    public boolean esAdministrador() {
+        return tipoUsuario != null && tipoUsuario.esAdministrador();
+    }
 }

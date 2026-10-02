@@ -62,4 +62,19 @@ public class Bitacora {
         String salida = (fechaHoraSalida != null) ? fechaHoraSalida.format(formato) : "Sesion abierta";
         return "Entrada: " + entrada + " | Salida: " + salida;
     }
+
+    /**
+     * Registra la salida del usuario con la fecha y hora actual
+     */
+    public void cerrarSesion() {
+        this.fechaHoraSalida = LocalDateTime.now();
+    }
+
+    /**
+     * La sesion sigue abierta mientras no se haya registrado la salida
+     * @return
+     */
+    public boolean estaAbierta(){
+        return fechaHoraSalida == null;
+    }
 }
