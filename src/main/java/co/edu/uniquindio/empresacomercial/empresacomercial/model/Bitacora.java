@@ -6,14 +6,14 @@ import java.time.format.DateTimeFormatter;
 public class Bitacora {
 
     private int id;
-    private int idUsuario;
+    private long idUsuario;
     private LocalDateTime fechaHoraEntrada;
     private LocalDateTime fechaHoraSalida;
 
     public Bitacora() {
     }
 
-    public Bitacora(int id, int idUsuario, LocalDateTime fechaHoraEntrada, LocalDateTime fechaHoraSalida) {
+    public Bitacora(int id, long idUsuario, LocalDateTime fechaHoraEntrada, LocalDateTime fechaHoraSalida) {
         this.id = id;
         this.idUsuario = idUsuario;
         this.fechaHoraEntrada = fechaHoraEntrada;
@@ -28,11 +28,11 @@ public class Bitacora {
         this.id = id;
     }
 
-    public int getIdUsuario() {
+    public long getIdUsuario() {
         return idUsuario;
     }
 
-    public void setIdUsuario(int idUsuario) {
+    public void setIdUsuario(long idUsuario) {
         this.idUsuario = idUsuario;
     }
 

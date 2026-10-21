@@ -8,6 +8,7 @@ import java.util.List;
 
 public class CiudadDAO {
 
+    // CREATE: inserta una ciudad y devuelve true si se insertó correctamente. El id generado se asigna al objeto ciudad.
     public boolean insertar(Ciudad ciudad) throws SQLException {
         String sql = "INSERT INTO Ciudad (nombre) VALUES (?)";
 
@@ -74,8 +75,7 @@ public class CiudadDAO {
         }
     }
 
-    // DELETE: elimina una ciudad. Si tiene proveedores, SQL Server lo rechaza
-    // y lanza SQLException (código 547).
+    // DELETE: elimina una ciudad. Si tiene proveedores, SQL Server lo rechaza y lanza SQLException
     public boolean eliminar(int id) throws SQLException {
         String sql = "DELETE FROM Ciudad WHERE id = ?";
 

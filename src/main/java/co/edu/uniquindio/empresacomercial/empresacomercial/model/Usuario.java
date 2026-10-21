@@ -2,7 +2,7 @@ package co.edu.uniquindio.empresacomercial.empresacomercial.model;
 
 public class Usuario {
 
-    private  int id;
+    private  long id;
     private String nombre;
     private String apellido;
     private String password;
@@ -11,7 +11,7 @@ public class Usuario {
     public Usuario() {
     }
 
-    public Usuario(int id, String nombre, String apellido, String password, TipoUsuario tipoUsuario) {
+    public Usuario(long id, String nombre, String apellido, String password, TipoUsuario tipoUsuario) {
         this.id = id;
         this.nombre = nombre;
         this.apellido = apellido;
@@ -19,11 +19,11 @@ public class Usuario {
         this.tipoUsuario = tipoUsuario;
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 
