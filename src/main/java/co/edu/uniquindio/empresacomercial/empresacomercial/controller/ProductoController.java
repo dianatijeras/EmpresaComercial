@@ -10,12 +10,16 @@ import java.util.List;
 public class ProductoController {
 
     private static final int LONGITUD_MAXIMA_NOMBRE = 100;        // VARCHAR(100)
-    private static final double PRECIO_MAXIMO = 9_999_999_999.99; // DECIMAL(12,2)
     private static final int ERROR_LLAVE_FORANEA = 547;           // código de SQL Server
 
     private final ProductoDAO dao = new ProductoDAO();
 
     // Consultar lo puede hacer cualquier usuario.
+    /**
+     * Lista todos los productos.
+     * @return
+     * @throws NegocioException
+     */
     public List<Producto> listar() throws NegocioException {
         try {
             return dao.listar();
@@ -24,6 +28,12 @@ public class ProductoController {
         }
     }
 
+    /**
+     * Busca un producto por su ID.
+     * @param id
+     * @return
+     * @throws NegocioException
+     */
     public Producto buscarPorId(int id) throws NegocioException {
         try {
             return dao.buscarPorId(id);
@@ -33,13 +43,19 @@ public class ProductoController {
     }
 
     // Crear, modificar y eliminar solo los usuarios que pueden modificar datos.
-    public Producto crear(String nombre, double precio, int idCategoria) throws NegocioException {
+    /**
+     * Crea un nuevo producto con el nombre y la categoría proporcionados.
+     * @param nombre
+     * @param idCategoria
+     * @return
+     * @throws NegocioException
+     */
+    public Producto crear(String nombre, int idCategoria) throws NegocioException {
         verificarPermisoModificar();
         nombre = validarNombre(nombre);
-        validarPrecio(precio);
         validarCategoria(idCategoria);
 
-        Producto producto = new Producto(0, nombre, precio, idCategoria);
+        Producto producto = new Producto(0, nombre, idCategoria);
         try {
             dao.insertar(producto);
             return producto;
@@ -48,14 +64,20 @@ public class ProductoController {
         }
     }
 
-    public void actualizar(int id, String nombre, double precio, int idCategoria) throws NegocioException {
+    /**
+     * Actualiza un producto existente con el ID, nombre y categoría proporcionados.
+     * @param id
+     * @param nombre
+     * @param idCategoria
+     * @throws NegocioException
+     */
+    public void actualizar(int id, String nombre, int idCategoria) throws NegocioException {
         verificarPermisoModificar();
         nombre = validarNombre(nombre);
-        validarPrecio(precio);
         validarCategoria(idCategoria);
 
         try {
-            if (!dao.actualizar(new Producto(id, nombre, precio, idCategoria))) {
+            if (!dao.actualizar(new Producto(id, nombre, idCategoria))) {
                 throw new NegocioException("El producto no existe.");
             }
         } catch (SQLException e) {
@@ -64,6 +86,11 @@ public class ProductoController {
     }
 
     // Al eliminar un producto también se borran sus vínculos con proveedores.
+    /**
+     * Elimina un producto por su ID.
+     * @param id
+     * @throws NegocioException
+     */
     public void eliminar(int id) throws NegocioException {
         verificarPermisoModificar();
 
@@ -76,6 +103,10 @@ public class ProductoController {
         }
     }
 
+    /**
+     * Verifica si el usuario actual tiene permisos para modificar datos.
+     * @throws NegocioException
+     */
     private void verificarPermisoModificar() throws NegocioException {
         Usuario usuario = Sesion.getUsuarioActual();
         if (usuario == null || !usuario.puedeModificarDatos()) {
@@ -83,6 +114,12 @@ public class ProductoController {
         }
     }
 
+    /**
+     * Valida el nombre del producto, asegurándose de que no sea nulo, vacío o exceda la longitud máxima permitida.
+     * @param nombre
+     * @return
+     * @throws NegocioException
+     */
     private String validarNombre(String nombre) throws NegocioException {
         if (nombre == null || nombre.trim().isEmpty()) {
             throw new NegocioException("El nombre del producto es obligatorio.");
@@ -94,15 +131,11 @@ public class ProductoController {
         return nombre;
     }
 
-    private void validarPrecio(double precio) throws NegocioException {
-        if (Double.isNaN(precio) || precio < 0) {
-            throw new NegocioException("El precio no puede ser negativo.");
-        }
-        if (precio > PRECIO_MAXIMO) {
-            throw new NegocioException("El precio es demasiado alto.");
-        }
-    }
-
+    /**
+     * Valida la categoría del producto, asegurándose de que sea un ID válido (mayor que cero).
+     * @param idCategoria
+     * @throws NegocioException
+     */
     private void validarCategoria(int idCategoria) throws NegocioException {
         if (idCategoria <= 0) {
             throw new NegocioException("Seleccione una categoría.");
@@ -110,6 +143,12 @@ public class ProductoController {
     }
 
     // Al guardar, un error de llave foránea significa que la categoría no existe.
+    /**
+     * Maneja los errores al guardar un producto, verificando si el error es debido a una llave foránea (categoría inexistente)
+     * o un error general de base de datos.
+     * @param e
+     * @return
+     */
     private NegocioException errorAlGuardar(SQLException e) {
         if (e.getErrorCode() == ERROR_LLAVE_FORANEA) {
             return new NegocioException("La categoría seleccionada no existe.");

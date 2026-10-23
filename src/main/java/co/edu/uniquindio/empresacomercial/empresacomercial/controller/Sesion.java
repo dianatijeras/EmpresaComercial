@@ -12,16 +12,28 @@ public class Sesion {
     private Sesion() {
     }
 
+    /**
+     * Inicia la sesión con el usuario proporcionado y establece la bitácora actual como nula.
+     * @param usuario
+     */
     public static void iniciar(Usuario usuario) {
         usuarioActual = usuario;
         bitacoraActual = null;
     }
 
+    /**
+     * Inicia la sesión con el usuario y la bitácora proporcionados.
+     * @param usuario
+     * @param bitacora
+     */
     public static void iniciar(Usuario usuario, Bitacora bitacora) {
         usuarioActual = usuario;
         bitacoraActual = bitacora;
     }
 
+    /**
+     * Cierra la sesión actual, estableciendo el usuario y la bitácora como nulos.
+     */
     public static void cerrar() {
         usuarioActual = null;
         bitacoraActual = null;

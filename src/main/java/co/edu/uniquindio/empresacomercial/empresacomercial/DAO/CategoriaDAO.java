@@ -8,6 +8,7 @@ import java.util.List;
 
 public class CategoriaDAO {
 
+    // CREATE: inserta una nueva categoría y devuelve true si se insertó correctamente.
     public boolean insertar(Categoria categoria) throws SQLException {
         String sql = "INSERT INTO Categoria (nombre, descripcion) VALUES (?, ?)";
 

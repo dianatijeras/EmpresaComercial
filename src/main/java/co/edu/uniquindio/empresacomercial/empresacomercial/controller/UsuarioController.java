@@ -17,6 +17,11 @@ public class UsuarioController {
 
     private final UsuarioDAO dao = new UsuarioDAO();
 
+    /**
+     * Lista todos los usuarios.
+     * @return
+     * @throws NegocioException
+     */
     public List<Usuario> listar() throws NegocioException {
         verificarAdministrador();
         try {
@@ -26,6 +31,12 @@ public class UsuarioController {
         }
     }
 
+    /**
+     * Busca un usuario por su ID.
+     * @param id
+     * @return
+     * @throws NegocioException
+     */
     public Usuario buscarPorId(long id) throws NegocioException {
         verificarAdministrador();
         try {
@@ -35,8 +46,17 @@ public class UsuarioController {
         }
     }
 
-    public Usuario crear(String cedula, String nombre, String apellido,
-                         String password, TipoUsuario tipo) throws NegocioException {
+    /**
+     * Crea un nuevo usuario con los datos proporcionados.
+     * @param cedula
+     * @param nombre
+     * @param apellido
+     * @param password
+     * @param tipo
+     * @return
+     * @throws NegocioException
+     */
+    public Usuario crear(String cedula, String nombre, String apellido, String password, TipoUsuario tipo) throws NegocioException {
         verificarAdministrador();
         long id = validarCedula(cedula);
         nombre = validarTexto(nombre, "El nombre");
@@ -57,9 +77,17 @@ public class UsuarioController {
         }
     }
 
-    // La cédula no se cambia. Si la contraseña viene vacía se conserva la actual.
-    public void actualizar(long id, String nombre, String apellido,
-                           String password, TipoUsuario tipo) throws NegocioException {
+    /**
+     * Actualiza un usuario existente con los datos proporcionados.
+     * La cédula no se cambia. Si la contraseña viene vacía se conserva la actual.
+     * @param id
+     * @param nombre
+     * @param apellido
+     * @param password
+     * @param tipo
+     * @throws NegocioException
+     */
+    public void actualizar(long id, String nombre, String apellido, String password, TipoUsuario tipo) throws NegocioException {
         verificarAdministrador();
         nombre = validarTexto(nombre, "El nombre");
         apellido = validarTexto(apellido, "El apellido");
@@ -85,6 +113,12 @@ public class UsuarioController {
         }
     }
 
+    /**
+     * Elimina un usuario por su ID.
+     * No se puede eliminar al administrador ni a un usuario que tenga registros en la bitácora.
+     * @param id
+     * @throws NegocioException
+     */
     public void eliminar(long id) throws NegocioException {
         verificarAdministrador();
 
@@ -105,7 +139,10 @@ public class UsuarioController {
         }
     }
 
-
+    /**
+     * Verifica si el usuario actual es administrador. Si no lo es, lanza una excepción.
+     * @throws NegocioException
+     */
     private void verificarAdministrador() throws NegocioException {
         Usuario usuario = Sesion.getUsuarioActual();
         if (usuario == null || !usuario.puedeCrearUsuario()) {
@@ -113,6 +150,13 @@ public class UsuarioController {
         }
     }
 
+    /**
+     * Valida la cédula, asegurándose de que no sea nula, vacía, contenga solo números y
+     * no exceda la longitud máxima permitida.
+     * @param cedula
+     * @return
+     * @throws NegocioException
+     */
     private long validarCedula(String cedula) throws NegocioException {
         if (cedula == null || cedula.trim().isEmpty()) {
             throw new NegocioException("La cédula es obligatoria.");
@@ -131,6 +175,13 @@ public class UsuarioController {
         return id;
     }
 
+    /**
+     * Valida un texto, asegurándose de que no sea nulo, vacío o exceda la longitud máxima permitida.
+     * @param valor
+     * @param nombreCampo
+     * @return
+     * @throws NegocioException
+     */
     private String validarTexto(String valor, String nombreCampo) throws NegocioException {
         if (valor == null || valor.trim().isEmpty()) {
             throw new NegocioException(nombreCampo + " es obligatorio.");
@@ -142,6 +193,12 @@ public class UsuarioController {
         return valor;
     }
 
+    /**
+     * Maneja los errores de SQL al guardar un usuario,
+     * devolviendo un mensaje adecuado según el código de error.
+     * @param e
+     * @return
+     */
     private NegocioException errorAlGuardar(SQLException e) {
         if (e.getErrorCode() == ERROR_LLAVE_DUPLICADA) {
             return new NegocioException("Ya existe un usuario con esa cédula.");

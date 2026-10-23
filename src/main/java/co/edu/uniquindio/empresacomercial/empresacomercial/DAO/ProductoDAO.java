@@ -2,23 +2,24 @@ package co.edu.uniquindio.empresacomercial.empresacomercial.DAO;
 
 import co.edu.uniquindio.empresacomercial.empresacomercial.model.Producto;
 
-import java.math.BigDecimal;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * CRUD de la tabla producto
+ */
 public class ProductoDAO {
 
     // CREATE: el id lo asigna SQL Server y se copia al objeto.
     public boolean insertar(Producto producto) throws SQLException {
-        String sql = "INSERT INTO Producto (nombre, precio, idCategoria) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO Producto (nombre, idCategoria) VALUES (?, ?)";
 
         try (Connection con = ConexionBD.getConexion();
              PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             ps.setString(1, producto.getNombre());
-            ps.setBigDecimal(2, BigDecimal.valueOf(producto.getPrecio()));
-            ps.setInt(3, producto.getIdCategoria());
+            ps.setInt(2, producto.getIdCategoria());
             int filas = ps.executeUpdate();
 
             if (filas > 0) {
@@ -34,7 +35,7 @@ public class ProductoDAO {
 
     // READ: todos los productos ordenados por nombre.
     public List<Producto> listar() throws SQLException {
-        String sql = "SELECT id, nombre, precio, idCategoria FROM Producto ORDER BY nombre";
+        String sql = "SELECT id, nombre, idCategoria FROM Producto ORDER BY nombre";
         List<Producto> productos = new ArrayList<>();
 
         try (Connection con = ConexionBD.getConexion();
@@ -50,7 +51,7 @@ public class ProductoDAO {
 
     // READ: devuelve null si no existe.
     public Producto buscarPorId(int id) throws SQLException {
-        String sql = "SELECT id, nombre, precio, idCategoria FROM Producto WHERE id = ?";
+        String sql = "SELECT id, nombre, idCategoria FROM Producto WHERE id = ?";
 
         try (Connection con = ConexionBD.getConexion();
              PreparedStatement ps = con.prepareStatement(sql)) {
@@ -67,20 +68,19 @@ public class ProductoDAO {
 
     // UPDATE
     public boolean actualizar(Producto producto) throws SQLException {
-        String sql = "UPDATE Producto SET nombre = ?, precio = ?, idCategoria = ? WHERE id = ?";
+        String sql = "UPDATE Producto SET nombre = ?, idCategoria = ? WHERE id = ?";
 
         try (Connection con = ConexionBD.getConexion();
              PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setString(1, producto.getNombre());
-            ps.setBigDecimal(2, BigDecimal.valueOf(producto.getPrecio()));
-            ps.setInt(3, producto.getIdCategoria());
-            ps.setInt(4, producto.getId());
+            ps.setInt(2, producto.getIdCategoria());
+            ps.setInt(3, producto.getId());
             return ps.executeUpdate() > 0;
         }
     }
 
-    // DELETE: también se borran sus vínculos con proveedores
+    // DELETE: también se borran sus vínculos con proveedores (ON DELETE CASCADE).
     public boolean eliminar(int id) throws SQLException {
         String sql = "DELETE FROM Producto WHERE id = ?";
 
@@ -97,7 +97,7 @@ public class ProductoDAO {
         return new Producto(
                 rs.getInt("id"),
                 rs.getString("nombre"),
-                rs.getDouble("precio"),
                 rs.getInt("idCategoria"));
     }
 }
+

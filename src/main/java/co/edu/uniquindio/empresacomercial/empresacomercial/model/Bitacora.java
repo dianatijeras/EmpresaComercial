@@ -1,23 +1,27 @@
 package co.edu.uniquindio.empresacomercial.empresacomercial.model;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.time.LocalDate;
+import java.time.LocalTime;
 
 public class Bitacora {
 
     private int id;
     private long idUsuario;
-    private LocalDateTime fechaHoraEntrada;
-    private LocalDateTime fechaHoraSalida;
+    private LocalDate fechaEntrada;
+    private LocalTime horaEntrada;
+    private LocalDate fechaSalida;
+    private LocalTime horaSalida;
 
     public Bitacora() {
     }
 
-    public Bitacora(int id, long idUsuario, LocalDateTime fechaHoraEntrada, LocalDateTime fechaHoraSalida) {
+    public Bitacora(int id, long idUsuario, LocalDate fechaEntrada, LocalTime horaEntrada, LocalDate fechaSalida, LocalTime horaSalida) {
         this.id = id;
         this.idUsuario = idUsuario;
-        this.fechaHoraEntrada = fechaHoraEntrada;
-        this.fechaHoraSalida = fechaHoraSalida;
+        this.fechaEntrada = fechaEntrada;
+        this.horaEntrada = horaEntrada;
+        this.fechaSalida = fechaSalida;
+        this.horaSalida = horaSalida;
     }
 
     public int getId() {
@@ -36,45 +40,59 @@ public class Bitacora {
         this.idUsuario = idUsuario;
     }
 
-    public LocalDateTime getFechaHoraEntrada() {
-        return fechaHoraEntrada;
+    public LocalDate getFechaEntrada() {
+        return fechaEntrada;
     }
 
-    public void setFechaHoraEntrada(LocalDateTime fechaHoraEntrada) {
-        this.fechaHoraEntrada = fechaHoraEntrada;
+    public void setFechaEntrada(LocalDate fechaEntrada) {
+        this.fechaEntrada = fechaEntrada;
     }
 
-    public LocalDateTime getFechaHoraSalida() {
-        return fechaHoraSalida;
+    public LocalTime getHoraEntrada() {
+        return horaEntrada;
     }
 
-    public void setFechaHoraSalida(LocalDateTime fechaHoraSalida) {
-        this.fechaHoraSalida = fechaHoraSalida;
+    public void setHoraEntrada(LocalTime horaEntrada) {
+        this.horaEntrada = horaEntrada;
+    }
+
+    public LocalDate getFechaSalida() {
+        return fechaSalida;
+    }
+
+    public void setFechaSalida(LocalDate fechaSalida) {
+        this.fechaSalida = fechaSalida;
+    }
+
+    public LocalTime getHoraSalida() {
+        return horaSalida;
+    }
+
+    public void setHoraSalida(LocalTime horaSalida) {
+        this.horaSalida = horaSalida;
     }
 
     /**
-     * Atributo derivado: solo tiene getter, no tiene setter
-     * @return
+     * Registra la entrada con la fecha y la hora actuales
      */
-    public String getRegistro(){
-        DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd/MM/YYYY HH:mm:ss");
-        String entrada = (fechaHoraEntrada != null) ? fechaHoraEntrada.format(formato) : "-";
-        String salida = (fechaHoraSalida != null) ? fechaHoraSalida.format(formato) : "Sesion abierta";
-        return "Entrada: " + entrada + " | Salida: " + salida;
+    public void iniciarSesion() {
+        this.fechaEntrada = LocalDate.now();
+        this.horaEntrada = LocalTime.now().withNano(0);
     }
 
     /**
-     * Registra la salida del usuario con la fecha y hora actual
+     * Registra la salida con la fecha y la hora actuales
      */
     public void cerrarSesion() {
-        this.fechaHoraSalida = LocalDateTime.now();
+        this.fechaSalida = LocalDate.now();
+        this.horaSalida = LocalTime.now().withNano(0);
     }
 
     /**
-     * La sesion sigue abierta mientras no se haya registrado la salida
+     * La sesión sigue abierta mientras no se haya registrado la salida.
      * @return
      */
-    public boolean estaAbierta(){
-        return fechaHoraSalida == null;
+    public boolean estaAbierta() {
+        return fechaSalida == null;
     }
 }

@@ -24,6 +24,12 @@ public class CategoriaController {
         }
     }
 
+    /**
+     * Busca una categoría por su ID.
+     * @param id
+     * @return
+     * @throws NegocioException
+     */
     public Categoria buscarPorId(int id) throws NegocioException {
         try {
             return dao.buscarPorId(id);
@@ -33,6 +39,13 @@ public class CategoriaController {
     }
 
     // Crear, modificar y eliminar solo los usuarios que pueden modificar datos.
+    /**
+     * Crea una nueva categoría con el nombre y descripción proporcionados.
+     * @param nombre
+     * @param descripcion
+     * @return
+     * @throws NegocioException
+     */
     public Categoria crear(String nombre, String descripcion) throws NegocioException {
         verificarPermisoModificar();
         nombre = validarNombre(nombre);
@@ -47,6 +60,13 @@ public class CategoriaController {
         }
     }
 
+    /**
+     * Actualiza una categoría existente con el ID, nombre y descripción proporcionados.
+     * @param id
+     * @param nombre
+     * @param descripcion
+     * @throws NegocioException
+     */
     public void actualizar(int id, String nombre, String descripcion) throws NegocioException {
         verificarPermisoModificar();
         nombre = validarNombre(nombre);
@@ -61,6 +81,11 @@ public class CategoriaController {
         }
     }
 
+    /**
+     * Elimina una categoría existente por su ID.
+     * @param id
+     * @throws NegocioException
+     */
     public void eliminar(int id) throws NegocioException {
         verificarPermisoModificar();
 
@@ -76,6 +101,10 @@ public class CategoriaController {
         }
     }
 
+    /**
+     * Verifica si el usuario actual tiene permisos para modificar datos.
+     * @throws NegocioException
+     */
     private void verificarPermisoModificar() throws NegocioException {
         Usuario usuario = Sesion.getUsuarioActual();
         if (usuario == null || !usuario.puedeModificarDatos()) {
@@ -83,6 +112,12 @@ public class CategoriaController {
         }
     }
 
+    /**
+     * Valida el nombre de la categoría, asegurándose de que no sea nulo, vacío o exceda la longitud máxima permitida.
+     * @param nombre
+     * @return
+     * @throws NegocioException
+     */
     private String validarNombre(String nombre) throws NegocioException {
         if (nombre == null || nombre.trim().isEmpty()) {
             throw new NegocioException("El nombre de la categoría es obligatorio.");
@@ -94,7 +129,13 @@ public class CategoriaController {
         return nombre;
     }
 
-    // La descripción es opcional: si viene vacía se guarda como null.
+    /**
+     * Valida la descripción de la categoría, asegurándose de que no exceda la longitud máxima permitida.
+     * Si la descripción es nula o vacía, devuelve null.
+     * @param descripcion
+     * @return
+     * @throws NegocioException
+     */
     private String validarDescripcion(String descripcion) throws NegocioException {
         if (descripcion == null || descripcion.trim().isEmpty()) {
             return null;

@@ -21,11 +21,11 @@ public class PruebaLogin {
                     + " (" + admin.getTipoUsuario() + "), puede crear usuarios: " + admin.puedeCrearUsuario());
 
             Bitacora bitacora = Sesion.getBitacoraActual();
-            System.out.println("Bitácora (id " + bitacora.getId() + "): " + bitacora.getRegistro());
+            System.out.println("Bitácora (id " + bitacora.getId() + "): " + describir(bitacora));
 
             // 3. Salida
             login.cerrarSesion();
-            System.out.println("Sesión cerrada: " + bitacora.getRegistro());
+            System.out.println("Sesión cerrada: " + describir(bitacora));
             System.out.println("Usuario en sesión después de salir: " + Sesion.getUsuarioActual());
 
             // 4. Ingreso de un usuario esporádico
@@ -37,6 +37,11 @@ public class PruebaLogin {
         } catch (NegocioException e) {
             System.out.println("Error inesperado: " + e.getMessage());
         }
+    }
+
+    private static String describir(Bitacora b) {
+        String salida = b.estaAbierta() ? "sesión abierta" : b.getFechaSalida() + " " + b.getHoraSalida();
+        return "entrada " + b.getFechaEntrada() + " " + b.getHoraEntrada() + " | salida: " + salida;
     }
 
     private static void intentar(LoginController login, String cedula, String password, String caso) {

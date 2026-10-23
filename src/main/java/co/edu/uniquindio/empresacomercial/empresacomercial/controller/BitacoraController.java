@@ -11,6 +11,12 @@ public class BitacoraController {
 
     private final BitacoraDAO dao = new BitacoraDAO();
 
+    /**
+     * Lista todas las entradas de la bitácora.
+     * Solo el administrador puede consultar la bitácora.
+     * @return
+     * @throws NegocioException
+     */
     public List<Bitacora> listar() throws NegocioException {
         Usuario usuario = Sesion.getUsuarioActual();
         if (usuario == null || !usuario.esAdministrador()) {

@@ -13,6 +13,11 @@ public class CiudadController {
 
     private final CiudadDAO dao = new CiudadDAO();
 
+    /**
+     * Lista todas las ciudades.
+     * @return
+     * @throws NegocioException
+     */
     public List<Ciudad> listar() throws NegocioException {
         try {
             return dao.listar();
@@ -21,6 +26,12 @@ public class CiudadController {
         }
     }
 
+    /**
+     * Busca una ciudad por su ID.
+     * @param id
+     * @return
+     * @throws NegocioException
+     */
     public Ciudad buscarPorId(int id) throws NegocioException {
         try {
             return dao.buscarPorId(id);
@@ -30,6 +41,12 @@ public class CiudadController {
     }
 
     // Crear, modificar y eliminar solo los usuarios que pueden modificar datos.
+    /**
+     * Crea una nueva ciudad con el nombre proporcionado.
+     * @param nombre
+     * @return
+     * @throws NegocioException
+     */
     public Ciudad crear(String nombre) throws NegocioException {
         verificarPermisoModificar();
         nombre = validarNombre(nombre);
@@ -44,6 +61,12 @@ public class CiudadController {
         }
     }
 
+    /**
+     * Actualiza una ciudad existente con el ID y nombre proporcionados.
+     * @param id
+     * @param nombre
+     * @throws NegocioException
+     */
     public void actualizar(int id, String nombre) throws NegocioException {
         verificarPermisoModificar();
         nombre = validarNombre(nombre);
@@ -57,6 +80,11 @@ public class CiudadController {
         }
     }
 
+    /**
+     * Elimina una ciudad por su ID. No se puede eliminar si tiene proveedores asociados.
+     * @param id
+     * @throws NegocioException
+     */
     public void eliminar(int id) throws NegocioException {
         verificarPermisoModificar();
 
@@ -72,6 +100,10 @@ public class CiudadController {
         }
     }
 
+    /**
+     * Verifica si el usuario actual tiene permisos para modificar datos.
+     * @throws NegocioException
+     */
     private void verificarPermisoModificar() throws NegocioException {
         Usuario usuario = Sesion.getUsuarioActual();
         if (usuario == null || !usuario.puedeModificarDatos()) {
@@ -79,6 +111,12 @@ public class CiudadController {
         }
     }
 
+    /**
+     * Valida el nombre de la ciudad. No puede estar vacío ni exceder la longitud máxima.
+     * @param nombre
+     * @return
+     * @throws NegocioException
+     */
     private String validarNombre(String nombre) throws NegocioException {
         if (nombre == null || nombre.trim().isEmpty()) {
             throw new NegocioException("El nombre de la ciudad es obligatorio.");

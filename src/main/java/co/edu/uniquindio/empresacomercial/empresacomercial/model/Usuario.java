@@ -63,8 +63,6 @@ public class Usuario {
      * Los permisos los define el tipo de usuario, aqui solo se pregunta
      * @return
      */
-
-
     public boolean puedeCrearUsuario() {
         return tipoUsuario != null && tipoUsuario.puedeCrearUsuario();
     }

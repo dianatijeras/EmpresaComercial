@@ -10,7 +10,7 @@ public class Proveedor {
     private String telefono;
     private String direccion;
     private int idCiudad;
-    private List<Producto> productos = new ArrayList<>();
+    private List<ProveedorProducto> productos = new ArrayList<>();
 
     public Proveedor() {
     }
@@ -63,49 +63,60 @@ public class Proveedor {
         this.idCiudad = idCiudad;
     }
 
-    public List<Producto> getProductos() {
+    public List<ProveedorProducto> getProductos() {
         return productos;
     }
 
-    public void setProductos(List<Producto> productos) {
+    public void setProductos(List<ProveedorProducto> productos) {
         this.productos = productos;
     }
 
+
     /**
-     * Dice si el proveedor ya tiene ese producto (se compara por id)
+     *  Devuelve el producto con su precio si el proveedor lo ofrece
+     *  (se compara por id), o null.
      * @param producto
      * @return
      */
-    public boolean tieneProducto(Producto producto){
-        for (Producto p : productos){
-            if (p.getId() == producto.getId()){
-                return true;
+    public ProveedorProducto buscarProducto(Producto producto) {
+        for (ProveedorProducto pp : productos) {
+            if (pp.getProducto().getId() == producto.getId()) {
+                return pp;
             }
         }
-        return false;
+        return null;
     }
 
     /**
-     * Agrega el producto si no estaba
-     * Devuelve true si se agrego
+     * Devuelve true si el proveedor ofrece el producto (se compara por id).
      * @param producto
      * @return
      */
-    public boolean agregarProducto(Producto producto){
-        if (tieneProducto(producto)){
+    public boolean tieneProducto(Producto producto) {
+        return buscarProducto(producto) != null;
+    }
+
+    /**
+     * Agrega el producto con su precio si no estaba.
+     * Devuelve true si lo agregó.
+     * @param producto
+     * @param precio
+     * @return
+     */
+    public boolean agregarProducto(Producto producto, double precio) {
+        if (tieneProducto(producto)) {
             return false;
         }
-        productos.add(producto);
+        productos.add(new ProveedorProducto(producto, precio));
         return true;
     }
 
     /**
-     * Quita el producto, se compara por id
-     * Devuelve true si se quito
+     * Quita el producto (se compara por id). Devuelve true si lo quitó.
      * @param producto
      * @return
      */
-    public boolean quitarProducto(Producto producto){
-        return productos.removeIf(p -> p.getId() == producto.getId());
+    public boolean quitarProducto(Producto producto) {
+        return productos.removeIf(pp -> pp.getProducto().getId() == producto.getId());
     }
 }

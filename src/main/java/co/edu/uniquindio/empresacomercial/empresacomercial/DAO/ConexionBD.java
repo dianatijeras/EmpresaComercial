@@ -12,9 +12,7 @@ public class ConexionBD {
     private static final String USUARIO = "app_proveedores";
     private static final String PASSWORD = "123";
 
-    private static final String URL = "jdbc:sqlserver://" + SERVIDOR + ":" + PUERTO
-            + ";databaseName=" + BASE_DATOS
-            + ";encrypt=true;trustServerCertificate=true";
+    private static final String URL = "jdbc:sqlserver://" + SERVIDOR + ":" + PUERTO + ";databaseName=" + BASE_DATOS + ";encrypt=true;trustServerCertificate=true";
 
     // Clase de utilidad: no se crean objetos de ella
     private ConexionBD() {
