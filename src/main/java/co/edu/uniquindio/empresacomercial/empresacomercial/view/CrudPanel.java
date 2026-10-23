@@ -88,9 +88,11 @@ public abstract class CrudPanel extends JPanel {
         JLabel lblTitulo = new JLabel(titulo);
         lblTitulo.setFont(lblTitulo.getFont().deriveFont(Font.BOLD, 18f));
 
-        JPanel botones = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JPanel botones = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 8));
         botones.add(btnNuevo);
+        botones.add(Box.createHorizontalStrut(8));
         botones.add(btnGuardar);
+        botones.add(Box.createHorizontalStrut(8));
         botones.add(btnEliminar);
 
         JPanel arriba = new JPanel();
@@ -142,7 +144,10 @@ public abstract class CrudPanel extends JPanel {
             c.gridx = 1;
             panel.add(campos[i], c);
         }
-        return panel;
+        // Se envuelve en un FlowLayout para que quede pegado a la izquierda
+        JPanel izquierda = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        izquierda.add(panel);
+        return izquierda;
     }
 
     // ---------- Acciones ----------

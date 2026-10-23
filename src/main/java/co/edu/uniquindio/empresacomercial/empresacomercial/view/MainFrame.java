@@ -73,16 +73,24 @@ public class MainFrame extends JFrame {
     private void construirContenido() {
         agregar(INICIO, new JLabel("Bienvenido, " + usuario.getNombre(), SwingConstants.CENTER));
 
-        // TODO: reemplazar cada placeholder por su panel real
-        agregar(CIUDADES, new CiudadPanel());
-        agregar(CATEGORIAS, pendiente("Categorías"));
-        agregar(PRODUCTOS, pendiente("Productos"));
-        agregar(PROVEEDORES, pendiente("Proveedores"));
-        agregar(PROVEEDOR_PRODUCTO, pendiente("Proveedor - Producto"));
+        // Cada panel se crea solo si el tipo de usuario puede abrirlo: así no se
+        // hacen consultas innecesarias ni salen errores de permisos al ingresar.
+        if (usuario.getTipoUsuario().puedeModificarDatos()) {
+            agregar(CIUDADES, new CiudadPanel());
+            agregar(CATEGORIAS, new CategoriaPanel());
+            agregar(PRODUCTOS, new ProductoPanel());
+            agregar(PROVEEDORES, new ProveedorPanel());
+            agregar(PROVEEDOR_PRODUCTO, new ProveedorProductoPanel());
+        }
+
+        // TODO: reemplazar por ConsultasPanel y ReportesPanel
         agregar(CONSULTAS, pendiente("Consultas"));
         agregar(REPORTES, pendiente("Reportes"));
-        agregar(USUARIOS, pendiente("Usuarios"));
-        agregar(BITACORA, pendiente("Bitácora"));
+
+        if (usuario.esAdministrador()) {
+            agregar(USUARIOS, new UsuarioPanel());
+            agregar(BITACORA, new BitacoraPanel());
+        }
     }
 
     private void agregar(String nombre, JComponent panel) {

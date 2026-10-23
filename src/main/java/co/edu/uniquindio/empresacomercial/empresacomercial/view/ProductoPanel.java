@@ -9,6 +9,7 @@ import co.edu.uniquindio.empresacomercial.empresacomercial.model.Producto;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JTextField;
+import java.awt.Dimension;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
@@ -27,6 +28,7 @@ public class ProductoPanel extends CrudPanel {
 
     public ProductoPanel() {
         super("Productos", new String[]{"ID", "Nombre", "Precio", "Categoría"});
+        cboCategoria.setPreferredSize(new Dimension(250, 26));
         iniciar(crearFormulario(
                 new String[]{"Nombre:", "Precio:", "Categoría:"},
                 new JComponent[]{txtNombre, txtPrecio, cboCategoria}));
