@@ -83,8 +83,8 @@ public class MainFrame extends JFrame {
             agregar(PROVEEDOR_PRODUCTO, new ProveedorProductoPanel());
         }
 
-        // TODO: reemplazar por ConsultasPanel y ReportesPanel
-        agregar(CONSULTAS, pendiente("Consultas"));
+        agregar(CONSULTAS, new ConsultasPanel());
+        // TODO: reemplazar por ReportesPanel
         agregar(REPORTES, pendiente("Reportes"));
 
         if (usuario.esAdministrador()) {
