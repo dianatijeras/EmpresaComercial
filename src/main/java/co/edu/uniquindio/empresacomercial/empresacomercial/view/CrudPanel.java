@@ -17,6 +17,10 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.HierarchyEvent;
 import java.util.List;
 
 /**
@@ -107,7 +111,38 @@ public abstract class CrudPanel extends JPanel {
         btnEliminar.addActionListener(e -> accionEliminar());
 
         btnEliminar.setEnabled(false);
+
+        // Cada vez que el panel se hace visible, se recargan los datos
+        // (así los combos y la tabla reflejan lo creado en otras pantallas)
+        addHierarchyListener(e -> {
+            if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0 && isShowing()) {
+                alMostrar();
+            }
+        });
+
         recargar();
+    }
+
+    /** Se ejecuta cada vez que el panel aparece en pantalla. */
+    protected void alMostrar() {
+        recargar();
+        nuevo();
+    }
+
+    /** Formulario de dos columnas (etiqueta, campo) listo para pasar a iniciar(). */
+    protected static JPanel crearFormulario(String[] etiquetas, JComponent[] campos) {
+        JPanel panel = new JPanel(new GridBagLayout());
+        GridBagConstraints c = new GridBagConstraints();
+        c.insets = new Insets(3, 3, 3, 8);
+        c.anchor = GridBagConstraints.WEST;
+        for (int i = 0; i < etiquetas.length; i++) {
+            c.gridy = i;
+            c.gridx = 0;
+            panel.add(new JLabel(etiquetas[i]), c);
+            c.gridx = 1;
+            panel.add(campos[i], c);
+        }
+        return panel;
     }
 
     // ---------- Acciones ----------
