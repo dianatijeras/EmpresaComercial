@@ -74,7 +74,7 @@ public class MainFrame extends JFrame {
         agregar(INICIO, new JLabel("Bienvenido, " + usuario.getNombre(), SwingConstants.CENTER));
 
         // TODO: reemplazar cada placeholder por su panel real
-        agregar(CIUDADES, pendiente("Ciudades"));
+        agregar(CIUDADES, new CiudadPanel());
         agregar(CATEGORIAS, pendiente("Categorías"));
         agregar(PRODUCTOS, pendiente("Productos"));
         agregar(PROVEEDORES, pendiente("Proveedores"));
