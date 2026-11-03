@@ -10,7 +10,7 @@ public class Proveedor {
     private String telefono;
     private String direccion;
     private int idCiudad;
-    private List<Producto> productos = new ArrayList<>();
+    private List<ProductoProveedor> productos = new ArrayList<>();
 
     public Proveedor() {
     }
@@ -63,11 +63,11 @@ public class Proveedor {
         this.idCiudad = idCiudad;
     }
 
-    public List<Producto> getProductos() {
+    public List<ProductoProveedor> getProductos() {
         return productos;
     }
 
-    public void setProductos(List<Producto> productos) {
+    public void setProductos(List<ProductoProveedor> productos) {
         this.productos = productos;
     }
 
@@ -77,7 +77,7 @@ public class Proveedor {
      * @return
      */
     public boolean tieneProducto(Producto producto){
-        for (Producto p : productos){
+        for (ProductoProveedor p : productos){
             if (p.getId() == producto.getId()){
                 return true;
             }
@@ -91,7 +91,7 @@ public class Proveedor {
      * @param producto
      * @return
      */
-    public boolean agregarProducto(Producto producto){
+    public boolean agregarProducto(ProductoProveedor producto){
         if (tieneProducto(producto)){
             return false;
         }

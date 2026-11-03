@@ -1,19 +1,21 @@
 package co.edu.uniquindio.empresacomercial.empresacomercial.model;
 
+/**
+ * Un producto del catálogo. No tiene precio: el precio es de cada proveedor
+ * y se guarda en el vínculo proveedor-producto (ver ProductoProveedor).
+ */
 public class Producto {
 
     private int id;
     private String nombre;
-    private double precio; //pendiente
     private int idCategoria;
 
     public Producto() {
     }
 
-    public Producto(int id, String nombre, double precio, int idCategoria) {
+    public Producto(int id, String nombre, int idCategoria) {
         this.id = id;
         this.nombre = nombre;
-        this.precio = precio;
         this.idCategoria = idCategoria;
     }
 
@@ -31,14 +33,6 @@ public class Producto {
 
     public void setNombre(String nombre) {
         this.nombre = nombre;
-    }
-
-    public double getPrecio() {
-        return precio;
-    }
-
-    public void setPrecio(double precio) {
-        this.precio = precio;
     }
 
     public int getIdCategoria() {

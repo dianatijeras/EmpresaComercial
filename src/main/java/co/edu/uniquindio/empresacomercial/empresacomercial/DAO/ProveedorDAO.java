@@ -1,8 +1,9 @@
 package co.edu.uniquindio.empresacomercial.empresacomercial.DAO;
 
-import co.edu.uniquindio.empresacomercial.empresacomercial.model.Producto;
+import co.edu.uniquindio.empresacomercial.empresacomercial.model.ProductoProveedor;
 import co.edu.uniquindio.empresacomercial.empresacomercial.model.Proveedor;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -107,15 +108,31 @@ public class ProveedorDAO {
         }
     }
 
-    // Vincula un producto con un proveedor. Si ya estaba vinculado, SQL Server lo rechaza (llave primaria repetida).
-    public boolean agregarProducto(String nit, int idProducto) throws SQLException {
-        String sql = "INSERT INTO Proveedor_Producto (nitProveedor, idProducto) VALUES (?, ?)";
+    // Vincula un producto con un proveedor al precio que ese proveedor le da.
+    // Si ya estaba vinculado, SQL Server lo rechaza (llave primaria repetida).
+    public boolean agregarProducto(String nit, int idProducto, double precio) throws SQLException {
+        String sql = "INSERT INTO Proveedor_Producto (nitProveedor, idProducto, precio) VALUES (?, ?, ?)";
 
         try (Connection con = ConexionBD.getConexion();
              PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setString(1, nit);
             ps.setInt(2, idProducto);
+            ps.setBigDecimal(3, BigDecimal.valueOf(precio));
+            return ps.executeUpdate() > 0;
+        }
+    }
+
+    // Cambia el precio que un proveedor tiene para un producto que ya ofrece.
+    public boolean actualizarPrecio(String nit, int idProducto, double precio) throws SQLException {
+        String sql = "UPDATE Proveedor_Producto SET precio = ? WHERE nitProveedor = ? AND idProducto = ?";
+
+        try (Connection con = ConexionBD.getConexion();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setBigDecimal(1, BigDecimal.valueOf(precio));
+            ps.setString(2, nit);
+            ps.setInt(3, idProducto);
             return ps.executeUpdate() > 0;
         }
     }
@@ -139,12 +156,13 @@ public class ProveedorDAO {
         if (proveedor.getProductos().isEmpty()) {
             return;
         }
-        String sql = "INSERT INTO Proveedor_Producto (nitProveedor, idProducto) VALUES (?, ?)";
+        String sql = "INSERT INTO Proveedor_Producto (nitProveedor, idProducto, precio) VALUES (?, ?, ?)";
 
         try (PreparedStatement ps = con.prepareStatement(sql)) {
-            for (Producto producto : proveedor.getProductos()) {
+            for (ProductoProveedor producto : proveedor.getProductos()) {
                 ps.setString(1, proveedor.getNit());
                 ps.setInt(2, producto.getId());
+                ps.setBigDecimal(3, BigDecimal.valueOf(producto.getPrecio()));
                 ps.addBatch();
             }
             ps.executeBatch();
@@ -153,22 +171,22 @@ public class ProveedorDAO {
 
     // Llena la lista de productos del proveedor con lo que hay en la base.
     private void cargarProductos(Connection con, Proveedor proveedor) throws SQLException {
-        String sql = "SELECT p.id, p.nombre, p.precio, p.idCategoria "
+        String sql = "SELECT p.id, p.nombre, p.idCategoria, pp.precio "
                 + "FROM Producto p "
                 + "JOIN Proveedor_Producto pp ON pp.idProducto = p.id "
                 + "WHERE pp.nitProveedor = ? "
                 + "ORDER BY p.nombre";
-        List<Producto> productos = new ArrayList<>();
+        List<ProductoProveedor> productos = new ArrayList<>();
 
         try (PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setString(1, proveedor.getNit());
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    productos.add(new Producto(
+                    productos.add(new ProductoProveedor(
                             rs.getInt("id"),
                             rs.getString("nombre"),
-                            rs.getDouble("precio"),
-                            rs.getInt("idCategoria")));
+                            rs.getInt("idCategoria"),
+                            rs.getDouble("precio")));
                 }
             }
         }

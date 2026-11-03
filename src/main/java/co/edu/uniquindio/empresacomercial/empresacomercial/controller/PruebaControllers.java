@@ -2,6 +2,7 @@ package co.edu.uniquindio.empresacomercial.empresacomercial.controller;
 
 import co.edu.uniquindio.empresacomercial.empresacomercial.model.Categoria;
 import co.edu.uniquindio.empresacomercial.empresacomercial.model.Producto;
+import co.edu.uniquindio.empresacomercial.empresacomercial.model.ProductoProveedor;
 import co.edu.uniquindio.empresacomercial.empresacomercial.model.TipoUsuario;
 import co.edu.uniquindio.empresacomercial.empresacomercial.model.Usuario;
 
@@ -46,26 +47,29 @@ public class PruebaControllers {
 
             //PRODUCTO
             System.out.println("Producto");
-            esperarError("Precio negativo", () -> productos.crear("Producto de prueba", -5, cat.getId()));
-            esperarError("Categoría inexistente", () -> productos.crear("Producto de prueba", 1500, 9999));
-            Producto prod = productos.crear("Producto de prueba", 1500, cat.getId());
+            esperarError("Nombre vacío", () -> productos.crear("", cat.getId()));
+            esperarError("Categoría inexistente", () -> productos.crear("Producto de prueba", 9999));
+            Producto prod = productos.crear("Producto de prueba", cat.getId());
             System.out.println("Producto creado: " + prod.getNombre() + " (id " + prod.getId() + ")");
-            productos.actualizar(prod.getId(), prod.getNombre(), 2000, cat.getId());
-            System.out.println("Producto actualizado, precio: " + productos.buscarPorId(prod.getId()).getPrecio());
+            productos.actualizar(prod.getId(), "Producto editado", cat.getId());
+            System.out.println("Producto actualizado, nombre: " + productos.buscarPorId(prod.getId()).getNombre());
 
             //PROVEEDOR
             System.out.println("Proveedor");
             String nit = "999999999-9";
-            proveedores.crear(nit, "Proveedor de prueba", "3000000000", "Calle 1 # 2-3", 1, List.of(prod));
+            proveedores.crear(nit, "Proveedor de prueba", "3000000000", "Calle 1 # 2-3", 1, List.of(new ProductoProveedor(prod.getId(), prod.getNombre(), cat.getId(), 1500)));
             System.out.println("Proveedor creado con "
                     + proveedores.buscarPorNit(nit).getProductos().size() + " producto(s)");
             esperarError("NIT repetido", () -> proveedores.crear(nit, "Otro", null, null, 1, null));
             esperarError("Ciudad inexistente", () -> proveedores.crear("888888888-8", "Otro", null, null, 9999, null));
 
-            proveedores.agregarProducto(nit, 1);
+            esperarError("Precio negativo", () -> proveedores.agregarProducto(nit, 1, -5));
+            proveedores.agregarProducto(nit, 1, 3500);
             System.out.println("Tras agregar otro producto: "
                     + proveedores.buscarPorNit(nit).getProductos().size());
-            esperarError("Producto repetido", () -> proveedores.agregarProducto(nit, 1));
+            esperarError("Producto repetido", () -> proveedores.agregarProducto(nit, 1, 3500));
+            proveedores.actualizarPrecio(nit, 1, 3600);
+            System.out.println("Precio actualizado en el proveedor");
             proveedores.quitarProducto(nit, 1);
             System.out.println("Tras quitar uno: " + proveedores.buscarPorNit(nit).getProductos().size());
 

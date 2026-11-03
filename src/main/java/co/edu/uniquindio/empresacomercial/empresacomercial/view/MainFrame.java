@@ -84,8 +84,7 @@ public class MainFrame extends JFrame {
         }
 
         agregar(CONSULTAS, new ConsultasPanel());
-        // TODO: reemplazar por ReportesPanel
-        agregar(REPORTES, pendiente("Reportes"));
+        agregar(REPORTES, new ReportesPanel());
 
         if (usuario.esAdministrador()) {
             agregar(USUARIOS, new UsuarioPanel());
@@ -95,10 +94,6 @@ public class MainFrame extends JFrame {
 
     private void agregar(String nombre, JComponent panel) {
         contenido.add(panel, nombre);
-    }
-
-    private JComponent pendiente(String titulo) {
-        return new JLabel(titulo + " (en construcción)", SwingConstants.CENTER);
     }
 
     public void mostrar(String nombre) {

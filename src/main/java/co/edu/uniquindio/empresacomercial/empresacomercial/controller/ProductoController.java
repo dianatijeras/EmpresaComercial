@@ -10,7 +10,6 @@ import java.util.List;
 public class ProductoController {
 
     private static final int LONGITUD_MAXIMA_NOMBRE = 100;        // VARCHAR(100)
-    private static final double PRECIO_MAXIMO = 9_999_999_999.99; // DECIMAL(12,2)
     private static final int ERROR_LLAVE_FORANEA = 547;           // código de SQL Server
 
     private final ProductoDAO dao = new ProductoDAO();
@@ -33,13 +32,12 @@ public class ProductoController {
     }
 
     // Crear, modificar y eliminar solo los usuarios que pueden modificar datos.
-    public Producto crear(String nombre, double precio, int idCategoria) throws NegocioException {
+    public Producto crear(String nombre, int idCategoria) throws NegocioException {
         verificarPermisoModificar();
         nombre = validarNombre(nombre);
-        validarPrecio(precio);
         validarCategoria(idCategoria);
 
-        Producto producto = new Producto(0, nombre, precio, idCategoria);
+        Producto producto = new Producto(0, nombre, idCategoria);
         try {
             dao.insertar(producto);
             return producto;
@@ -48,14 +46,13 @@ public class ProductoController {
         }
     }
 
-    public void actualizar(int id, String nombre, double precio, int idCategoria) throws NegocioException {
+    public void actualizar(int id, String nombre, int idCategoria) throws NegocioException {
         verificarPermisoModificar();
         nombre = validarNombre(nombre);
-        validarPrecio(precio);
         validarCategoria(idCategoria);
 
         try {
-            if (!dao.actualizar(new Producto(id, nombre, precio, idCategoria))) {
+            if (!dao.actualizar(new Producto(id, nombre, idCategoria))) {
                 throw new NegocioException("El producto no existe.");
             }
         } catch (SQLException e) {
@@ -92,15 +89,6 @@ public class ProductoController {
             throw new NegocioException("El nombre no puede tener más de " + LONGITUD_MAXIMA_NOMBRE + " caracteres.");
         }
         return nombre;
-    }
-
-    private void validarPrecio(double precio) throws NegocioException {
-        if (Double.isNaN(precio) || precio < 0) {
-            throw new NegocioException("El precio no puede ser negativo.");
-        }
-        if (precio > PRECIO_MAXIMO) {
-            throw new NegocioException("El precio es demasiado alto.");
-        }
     }
 
     private void validarCategoria(int idCategoria) throws NegocioException {

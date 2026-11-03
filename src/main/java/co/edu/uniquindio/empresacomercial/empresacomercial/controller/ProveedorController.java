@@ -1,7 +1,7 @@
 package co.edu.uniquindio.empresacomercial.empresacomercial.controller;
 
 import co.edu.uniquindio.empresacomercial.empresacomercial.DAO.ProveedorDAO;
-import co.edu.uniquindio.empresacomercial.empresacomercial.model.Producto;
+import co.edu.uniquindio.empresacomercial.empresacomercial.model.ProductoProveedor;
 import co.edu.uniquindio.empresacomercial.empresacomercial.model.Proveedor;
 import co.edu.uniquindio.empresacomercial.empresacomercial.model.Usuario;
 
@@ -14,6 +14,7 @@ public class ProveedorController {
     private static final int LONGITUD_MAXIMA_NOMBRE = 100;     // VARCHAR(100)
     private static final int LONGITUD_MAXIMA_TELEFONO = 20;    // VARCHAR(20)
     private static final int LONGITUD_MAXIMA_DIRECCION = 120;  // VARCHAR(120)
+    private static final double PRECIO_MAXIMO = 9_999_999_999.99; // DECIMAL(12,2)
     private static final int ERROR_LLAVE_FORANEA = 547;        // código de SQL Server
     private static final int ERROR_LLAVE_DUPLICADA = 2627;     // código de SQL Server
 
@@ -36,9 +37,9 @@ public class ProveedorController {
         }
     }
 
-    // Crea el proveedor junto con sus productos (la lista puede ser null o estar vacía).
+    // Crea el proveedor junto con sus productos y precios (la lista puede ser null o estar vacía).
     public Proveedor crear(String nit, String nombre, String telefono, String direccion,
-                           int idCiudad, List<Producto> productos) throws NegocioException {
+                           int idCiudad, List<ProductoProveedor> productos) throws NegocioException {
         verificarPermisoModificar();
         nit = validarNit(nit);
         nombre = validarNombre(nombre);
@@ -48,7 +49,8 @@ public class ProveedorController {
 
         Proveedor proveedor = new Proveedor(nit, nombre, telefono, direccion, idCiudad);
         if (productos != null) {
-            for (Producto producto : productos) {
+            for (ProductoProveedor producto : productos) {
+                validarPrecio(producto.getPrecio());
                 proveedor.agregarProducto(producto); // evita repetidos
             }
         }
@@ -101,11 +103,13 @@ public class ProveedorController {
         }
     }
 
-    public void agregarProducto(String nit, int idProducto) throws NegocioException {
+    // El precio es el que este proveedor le da al producto.
+    public void agregarProducto(String nit, int idProducto, double precio) throws NegocioException {
         verificarPermisoModificar();
+        validarPrecio(precio);
 
         try {
-            dao.agregarProducto(nit, idProducto);
+            dao.agregarProducto(nit, idProducto, precio);
         } catch (SQLException e) {
             if (e.getErrorCode() == ERROR_LLAVE_DUPLICADA) {
                 throw new NegocioException("El proveedor ya tiene ese producto.");
@@ -113,6 +117,20 @@ public class ProveedorController {
             if (e.getErrorCode() == ERROR_LLAVE_FORANEA) {
                 throw new NegocioException("El proveedor o el producto no existe.");
             }
+            throw errorBD(e);
+        }
+    }
+
+    // Cambia el precio de un producto que el proveedor ya ofrece.
+    public void actualizarPrecio(String nit, int idProducto, double precio) throws NegocioException {
+        verificarPermisoModificar();
+        validarPrecio(precio);
+
+        try {
+            if (!dao.actualizarPrecio(nit, idProducto, precio)) {
+                throw new NegocioException("El proveedor no tiene ese producto.");
+            }
+        } catch (SQLException e) {
             throw errorBD(e);
         }
     }
@@ -168,6 +186,15 @@ public class ProveedorController {
             throw new NegocioException(nombreCampo + " no puede tener más de " + maximo + " caracteres.");
         }
         return valor;
+    }
+
+    private void validarPrecio(double precio) throws NegocioException {
+        if (Double.isNaN(precio) || precio < 0) {
+            throw new NegocioException("El precio no puede ser negativo.");
+        }
+        if (precio > PRECIO_MAXIMO) {
+            throw new NegocioException("El precio es demasiado alto.");
+        }
     }
 
     private void validarCiudad(int idCiudad) throws NegocioException {
