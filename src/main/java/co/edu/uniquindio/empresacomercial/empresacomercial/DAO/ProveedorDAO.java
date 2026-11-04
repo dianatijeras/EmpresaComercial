@@ -2,7 +2,6 @@ package co.edu.uniquindio.empresacomercial.empresacomercial.DAO;
 
 import co.edu.uniquindio.empresacomercial.empresacomercial.model.ProductoProveedor;
 import co.edu.uniquindio.empresacomercial.empresacomercial.model.Proveedor;
-import co.edu.uniquindio.empresacomercial.empresacomercial.model.ProveedorProducto;
 
 import java.math.BigDecimal;
 import java.sql.Connection;

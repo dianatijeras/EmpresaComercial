@@ -3,7 +3,6 @@ package co.edu.uniquindio.empresacomercial.empresacomercial.controller;
 import co.edu.uniquindio.empresacomercial.empresacomercial.DAO.ProveedorDAO;
 import co.edu.uniquindio.empresacomercial.empresacomercial.model.ProductoProveedor;
 import co.edu.uniquindio.empresacomercial.empresacomercial.model.Proveedor;
-import co.edu.uniquindio.empresacomercial.empresacomercial.model.ProveedorProducto;
 import co.edu.uniquindio.empresacomercial.empresacomercial.model.Usuario;
 
 import java.sql.SQLException;
@@ -239,15 +238,6 @@ public class ProveedorController {
             throw new NegocioException(nombreCampo + " no puede tener más de " + maximo + " caracteres.");
         }
         return valor;
-    }
-
-    private void validarPrecio(double precio) throws NegocioException {
-        if (Double.isNaN(precio) || precio < 0) {
-            throw new NegocioException("El precio no puede ser negativo.");
-        }
-        if (precio > PRECIO_MAXIMO) {
-            throw new NegocioException("El precio es demasiado alto.");
-        }
     }
 
     private void validarCiudad(int idCiudad) throws NegocioException {

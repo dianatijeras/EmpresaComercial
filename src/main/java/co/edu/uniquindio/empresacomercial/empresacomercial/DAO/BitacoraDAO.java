@@ -3,8 +3,6 @@ package co.edu.uniquindio.empresacomercial.empresacomercial.DAO;
 import co.edu.uniquindio.empresacomercial.empresacomercial.model.Bitacora;
 
 import java.sql.*;
-import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,10 +17,9 @@ public class BitacoraDAO {
         try (Connection con = ConexionBD.getConexion();
              PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
-            LocalDateTime entrada = bitacora.getFechaHoraEntrada();
             ps.setLong(1, bitacora.getIdUsuario());
-            ps.setDate(2, Date.valueOf(entrada.toLocalDate()));
-            ps.setTime(3, Time.valueOf(entrada.toLocalTime()));
+            ps.setDate(2, Date.valueOf(bitacora.getFechaEntrada()));
+            ps.setTime(3, Time.valueOf(bitacora.getHoraEntrada()));
             int filas = ps.executeUpdate();
 
             if (filas > 0) {
@@ -43,9 +40,8 @@ public class BitacoraDAO {
         try (Connection con = ConexionBD.getConexion();
              PreparedStatement ps = con.prepareStatement(sql)) {
 
-            LocalDateTime salida = bitacora.getFechaHoraSalida();
-            ps.setDate(1, Date.valueOf(salida.toLocalDate()));
-            ps.setTime(2, Time.valueOf(salida.toLocalTime()));
+            ps.setDate(1, Date.valueOf(bitacora.getFechaSalida()));
+            ps.setTime(2, Time.valueOf(bitacora.getHoraSalida()));
             ps.setInt(3, bitacora.getId());
             return ps.executeUpdate() > 0;
         }
@@ -62,23 +58,17 @@ public class BitacoraDAO {
              ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
-                // Se junta la fecha y la hora en un solo LocalDateTime
-                LocalDateTime entrada = LocalDateTime.of(
-                        rs.getDate("fechaEntrada").toLocalDate(),
-                        rs.getTime("horaEntrada").toLocalTime());
-
                 // La salida queda vacía (null) mientras la sesión esté abierta
                 Date fechaSalida = rs.getDate("fechaSalida");
                 Time horaSalida = rs.getTime("horaSalida");
-                LocalDateTime salida = (fechaSalida != null && horaSalida != null)
-                        ? LocalDateTime.of(fechaSalida.toLocalDate(), horaSalida.toLocalTime())
-                        : null;
 
                 registros.add(new Bitacora(
                         rs.getInt("id"),
                         rs.getLong("idUsuario"),
-                        entrada,
-                        salida));
+                        rs.getDate("fechaEntrada").toLocalDate(),
+                        rs.getTime("horaEntrada").toLocalTime(),
+                        fechaSalida != null ? fechaSalida.toLocalDate() : null,
+                        horaSalida != null ? horaSalida.toLocalTime() : null));
             }
         }
         return registros;

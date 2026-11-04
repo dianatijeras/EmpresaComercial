@@ -73,8 +73,7 @@ public class Proveedor {
 
 
     /**
-     *  Devuelve el producto con su precio si el proveedor lo ofrece
-     *  (se compara por id), o null.
+     * Devuelve true si el proveedor ya ofrece el producto (se compara por id).
      * @param producto
      * @return
      */
@@ -84,11 +83,12 @@ public class Proveedor {
                 return true;
             }
         }
-        return null;
+        return false;
     }
 
     /**
-     * Devuelve true si el proveedor ofrece el producto (se compara por id).
+     * Agrega el producto con su precio si el proveedor aún no lo ofrece.
+     * Devuelve true si lo agregó.
      * @param producto
      * @return
      */
@@ -96,7 +96,7 @@ public class Proveedor {
         if (tieneProducto(producto)){
             return false;
         }
-        productos.add(new ProveedorProducto(producto, precio));
+        productos.add(producto);
         return true;
     }
 
@@ -106,6 +106,6 @@ public class Proveedor {
      * @return
      */
     public boolean quitarProducto(Producto producto) {
-        return productos.removeIf(pp -> pp.getProducto().getId() == producto.getId());
+        return productos.removeIf(pp -> pp.getId() == producto.getId());
     }
 }

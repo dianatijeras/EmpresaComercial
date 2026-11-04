@@ -1,6 +1,7 @@
 package co.edu.uniquindio.empresacomercial.empresacomercial.model;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 public class Bitacora {
@@ -44,6 +45,13 @@ public class Bitacora {
         return fechaEntrada;
     }
 
+    public LocalDateTime getFechaHoraEntrada() {
+        if (fechaEntrada == null || horaEntrada == null) {
+            return null;
+        }
+        return LocalDateTime.of(fechaEntrada, horaEntrada);
+    }
+
     public void setFechaEntrada(LocalDate fechaEntrada) {
         this.fechaEntrada = fechaEntrada;
     }
@@ -58,6 +66,13 @@ public class Bitacora {
 
     public LocalDate getFechaSalida() {
         return fechaSalida;
+    }
+
+    public LocalDateTime getFechaHoraSalida() {
+        if (fechaSalida == null || horaSalida == null) {
+            return null;
+        }
+        return LocalDateTime.of(fechaSalida, horaSalida);
     }
 
     public void setFechaSalida(LocalDate fechaSalida) {
