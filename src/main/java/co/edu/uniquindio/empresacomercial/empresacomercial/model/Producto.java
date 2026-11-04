@@ -1,5 +1,9 @@
 package co.edu.uniquindio.empresacomercial.empresacomercial.model;
 
+/**
+ * Un producto del catálogo. No tiene precio: el precio es de cada proveedor
+ * y se guarda en el vínculo proveedor-producto (ver ProductoProveedor).
+ */
 public class Producto {
 
     private int id;

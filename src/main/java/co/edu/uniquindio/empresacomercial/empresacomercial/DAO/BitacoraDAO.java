@@ -13,14 +13,16 @@ public class BitacoraDAO {
 
     // Guarda un ingreso nuevo (sin salida todavía) y copia el id generado al objeto.
     public boolean registrarEntrada(Bitacora bitacora) throws SQLException {
+        // En la tabla la fecha y la hora van en columnas separadas
         String sql = "INSERT INTO Bitacora (idUsuario, fechaEntrada, horaEntrada) VALUES (?, ?, ?)";
 
         try (Connection con = ConexionBD.getConexion();
              PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
+            LocalDateTime entrada = bitacora.getFechaHoraEntrada();
             ps.setLong(1, bitacora.getIdUsuario());
-            ps.setObject(2, bitacora.getFechaEntrada());
-            ps.setObject(3, bitacora.getHoraEntrada());
+            ps.setDate(2, Date.valueOf(entrada.toLocalDate()));
+            ps.setTime(3, Time.valueOf(entrada.toLocalTime()));
             int filas = ps.executeUpdate();
 
             if (filas > 0) {
@@ -41,8 +43,9 @@ public class BitacoraDAO {
         try (Connection con = ConexionBD.getConexion();
              PreparedStatement ps = con.prepareStatement(sql)) {
 
-            ps.setObject(1, bitacora.getFechaSalida());
-            ps.setObject(2, bitacora.getHoraSalida());
+            LocalDateTime salida = bitacora.getFechaHoraSalida();
+            ps.setDate(1, Date.valueOf(salida.toLocalDate()));
+            ps.setTime(2, Time.valueOf(salida.toLocalTime()));
             ps.setInt(3, bitacora.getId());
             return ps.executeUpdate() > 0;
         }
@@ -51,7 +54,7 @@ public class BitacoraDAO {
     // READ: todos los registros, del más reciente al más antiguo.
     public List<Bitacora> listar() throws SQLException {
         String sql = "SELECT id, idUsuario, fechaEntrada, horaEntrada, fechaSalida, horaSalida "
-                + "FROM Bitacora ORDER BY fechaEntrada DESC, horaEntrada DESC";
+                + "FROM Bitacora ORDER BY fechaEntrada DESC, horaEntrada DESC, id DESC";
         List<Bitacora> registros = new ArrayList<>();
 
         try (Connection con = ConexionBD.getConexion();
@@ -59,13 +62,23 @@ public class BitacoraDAO {
              ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
+                // Se junta la fecha y la hora en un solo LocalDateTime
+                LocalDateTime entrada = LocalDateTime.of(
+                        rs.getDate("fechaEntrada").toLocalDate(),
+                        rs.getTime("horaEntrada").toLocalTime());
+
+                // La salida queda vacía (null) mientras la sesión esté abierta
+                Date fechaSalida = rs.getDate("fechaSalida");
+                Time horaSalida = rs.getTime("horaSalida");
+                LocalDateTime salida = (fechaSalida != null && horaSalida != null)
+                        ? LocalDateTime.of(fechaSalida.toLocalDate(), horaSalida.toLocalTime())
+                        : null;
+
                 registros.add(new Bitacora(
                         rs.getInt("id"),
                         rs.getLong("idUsuario"),
-                        rs.getObject("fechaEntrada", LocalDate.class),
-                        rs.getObject("horaEntrada", LocalTime.class),
-                        rs.getObject("fechaSalida", LocalDate.class),   // null si la sesión sigue abierta
-                        rs.getObject("horaSalida", LocalTime.class)));  // null si la sesión sigue abierta
+                        entrada,
+                        salida));
             }
         }
         return registros;

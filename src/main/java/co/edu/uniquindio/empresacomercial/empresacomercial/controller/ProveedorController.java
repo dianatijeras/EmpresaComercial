@@ -1,7 +1,7 @@
 package co.edu.uniquindio.empresacomercial.empresacomercial.controller;
 
 import co.edu.uniquindio.empresacomercial.empresacomercial.DAO.ProveedorDAO;
-import co.edu.uniquindio.empresacomercial.empresacomercial.model.Producto;
+import co.edu.uniquindio.empresacomercial.empresacomercial.model.ProductoProveedor;
 import co.edu.uniquindio.empresacomercial.empresacomercial.model.Proveedor;
 import co.edu.uniquindio.empresacomercial.empresacomercial.model.ProveedorProducto;
 import co.edu.uniquindio.empresacomercial.empresacomercial.model.Usuario;
@@ -50,19 +50,8 @@ public class ProveedorController {
     }
 
     // Crea el proveedor junto con sus productos y precios (la lista puede ser null o estar vacía).
-    /**
-     * Crea un nuevo proveedor con los datos proporcionados y sus productos con precios.
-     * @param nit
-     * @param nombre
-     * @param telefono
-     * @param direccion
-     * @param idCiudad
-     * @param productos
-     * @return
-     * @throws NegocioException
-     */
     public Proveedor crear(String nit, String nombre, String telefono, String direccion,
-                           int idCiudad, List<ProveedorProducto> productos) throws NegocioException {
+                           int idCiudad, List<ProductoProveedor> productos) throws NegocioException {
         verificarPermisoModificar();
         nit = validarNit(nit);
         nombre = validarNombre(nombre);
@@ -72,12 +61,9 @@ public class ProveedorController {
 
         Proveedor proveedor = new Proveedor(nit, nombre, telefono, direccion, idCiudad);
         if (productos != null) {
-            for (ProveedorProducto pp : productos) {
-                if (pp == null || pp.getProducto() == null) {
-                    throw new NegocioException("Hay un producto sin seleccionar.");
-                }
-                validarPrecio(pp.getPrecio());
-                proveedor.agregarProducto(pp.getProducto(), pp.getPrecio()); // evita repetidos
+            for (ProductoProveedor producto : productos) {
+                validarPrecio(producto.getPrecio());
+                proveedor.agregarProducto(producto); // evita repetidos
             }
         }
 
@@ -143,14 +129,7 @@ public class ProveedorController {
         }
     }
 
-    // Vincula un producto con el proveedor al precio indicado.
-    /**
-     * Agrega un producto a un proveedor con el precio indicado.
-     * @param nit
-     * @param idProducto
-     * @param precio
-     * @throws NegocioException
-     */
+    // El precio es el que este proveedor le da al producto.
     public void agregarProducto(String nit, int idProducto, double precio) throws NegocioException {
         verificarPermisoModificar();
         validarPrecio(precio);
@@ -168,14 +147,7 @@ public class ProveedorController {
         }
     }
 
-    /**
-     * Actualiza el precio de un producto que un proveedor ofrece.
-     * Cambia el precio al que el proveedor ofrece un producto.
-     * @param nit
-     * @param idProducto
-     * @param precio
-     * @throws NegocioException
-     */
+    // Cambia el precio de un producto que el proveedor ya ofrece.
     public void actualizarPrecio(String nit, int idProducto, double precio) throws NegocioException {
         verificarPermisoModificar();
         validarPrecio(precio);
@@ -269,12 +241,15 @@ public class ProveedorController {
         return valor;
     }
 
-    /**
-     * Valida que la ciudad seleccionada sea válida.
-     * Si el ID de la ciudad es menor o igual a cero, lanza una NegocioException.
-     * @param idCiudad
-     * @throws NegocioException
-     */
+    private void validarPrecio(double precio) throws NegocioException {
+        if (Double.isNaN(precio) || precio < 0) {
+            throw new NegocioException("El precio no puede ser negativo.");
+        }
+        if (precio > PRECIO_MAXIMO) {
+            throw new NegocioException("El precio es demasiado alto.");
+        }
+    }
+
     private void validarCiudad(int idCiudad) throws NegocioException {
         if (idCiudad <= 0) {
             throw new NegocioException("Seleccione una ciudad.");

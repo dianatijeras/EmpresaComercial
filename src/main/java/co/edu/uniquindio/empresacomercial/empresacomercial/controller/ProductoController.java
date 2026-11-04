@@ -43,13 +43,6 @@ public class ProductoController {
     }
 
     // Crear, modificar y eliminar solo los usuarios que pueden modificar datos.
-    /**
-     * Crea un nuevo producto con el nombre y la categoría proporcionados.
-     * @param nombre
-     * @param idCategoria
-     * @return
-     * @throws NegocioException
-     */
     public Producto crear(String nombre, int idCategoria) throws NegocioException {
         verificarPermisoModificar();
         nombre = validarNombre(nombre);
@@ -64,13 +57,6 @@ public class ProductoController {
         }
     }
 
-    /**
-     * Actualiza un producto existente con el ID, nombre y categoría proporcionados.
-     * @param id
-     * @param nombre
-     * @param idCategoria
-     * @throws NegocioException
-     */
     public void actualizar(int id, String nombre, int idCategoria) throws NegocioException {
         verificarPermisoModificar();
         nombre = validarNombre(nombre);
@@ -131,11 +117,6 @@ public class ProductoController {
         return nombre;
     }
 
-    /**
-     * Valida la categoría del producto, asegurándose de que sea un ID válido (mayor que cero).
-     * @param idCategoria
-     * @throws NegocioException
-     */
     private void validarCategoria(int idCategoria) throws NegocioException {
         if (idCategoria <= 0) {
             throw new NegocioException("Seleccione una categoría.");

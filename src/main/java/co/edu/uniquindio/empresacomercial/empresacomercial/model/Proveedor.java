@@ -10,7 +10,7 @@ public class Proveedor {
     private String telefono;
     private String direccion;
     private int idCiudad;
-    private List<ProveedorProducto> productos = new ArrayList<>();
+    private List<ProductoProveedor> productos = new ArrayList<>();
 
     public Proveedor() {
     }
@@ -63,11 +63,11 @@ public class Proveedor {
         this.idCiudad = idCiudad;
     }
 
-    public List<ProveedorProducto> getProductos() {
+    public List<ProductoProveedor> getProductos() {
         return productos;
     }
 
-    public void setProductos(List<ProveedorProducto> productos) {
+    public void setProductos(List<ProductoProveedor> productos) {
         this.productos = productos;
     }
 
@@ -78,10 +78,10 @@ public class Proveedor {
      * @param producto
      * @return
      */
-    public ProveedorProducto buscarProducto(Producto producto) {
-        for (ProveedorProducto pp : productos) {
-            if (pp.getProducto().getId() == producto.getId()) {
-                return pp;
+    public boolean tieneProducto(Producto producto){
+        for (ProductoProveedor p : productos){
+            if (p.getId() == producto.getId()){
+                return true;
             }
         }
         return null;
@@ -92,19 +92,8 @@ public class Proveedor {
      * @param producto
      * @return
      */
-    public boolean tieneProducto(Producto producto) {
-        return buscarProducto(producto) != null;
-    }
-
-    /**
-     * Agrega el producto con su precio si no estaba.
-     * Devuelve true si lo agregó.
-     * @param producto
-     * @param precio
-     * @return
-     */
-    public boolean agregarProducto(Producto producto, double precio) {
-        if (tieneProducto(producto)) {
+    public boolean agregarProducto(ProductoProveedor producto){
+        if (tieneProducto(producto)){
             return false;
         }
         productos.add(new ProveedorProducto(producto, precio));

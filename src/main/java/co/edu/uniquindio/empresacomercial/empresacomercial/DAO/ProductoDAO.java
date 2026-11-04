@@ -100,4 +100,3 @@ public class ProductoDAO {
                 rs.getInt("idCategoria"));
     }
 }
-

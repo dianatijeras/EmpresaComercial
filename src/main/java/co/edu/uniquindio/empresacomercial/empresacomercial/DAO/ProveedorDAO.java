@@ -1,6 +1,6 @@
 package co.edu.uniquindio.empresacomercial.empresacomercial.DAO;
 
-import co.edu.uniquindio.empresacomercial.empresacomercial.model.Producto;
+import co.edu.uniquindio.empresacomercial.empresacomercial.model.ProductoProveedor;
 import co.edu.uniquindio.empresacomercial.empresacomercial.model.Proveedor;
 import co.edu.uniquindio.empresacomercial.empresacomercial.model.ProveedorProducto;
 
@@ -112,7 +112,8 @@ public class ProveedorDAO {
         }
     }
 
-    // Vincula un producto con un proveedor y guarda su precio. Si ya estaba vinculado, SQL Server lo rechaza (llave primaria repetida).
+    // Vincula un producto con un proveedor al precio que ese proveedor le da.
+    // Si ya estaba vinculado, SQL Server lo rechaza (llave primaria repetida).
     public boolean agregarProducto(String nit, int idProducto, double precio) throws SQLException {
         String sql = "INSERT INTO Proveedor_Producto (nitProveedor, idProducto, precio) VALUES (?, ?, ?)";
 
@@ -126,7 +127,7 @@ public class ProveedorDAO {
         }
     }
 
-    // Cambia el precio al que un proveedor ofrece un producto.
+    // Cambia el precio que un proveedor tiene para un producto que ya ofrece.
     public boolean actualizarPrecio(String nit, int idProducto, double precio) throws SQLException {
         String sql = "UPDATE Proveedor_Producto SET precio = ? WHERE nitProveedor = ? AND idProducto = ?";
 
@@ -162,10 +163,10 @@ public class ProveedorDAO {
         String sql = "INSERT INTO Proveedor_Producto (nitProveedor, idProducto, precio) VALUES (?, ?, ?)";
 
         try (PreparedStatement ps = con.prepareStatement(sql)) {
-            for (ProveedorProducto pp : proveedor.getProductos()) {
+            for (ProductoProveedor producto : proveedor.getProductos()) {
                 ps.setString(1, proveedor.getNit());
-                ps.setInt(2, pp.getProducto().getId());
-                ps.setBigDecimal(3, BigDecimal.valueOf(pp.getPrecio()));
+                ps.setInt(2, producto.getId());
+                ps.setBigDecimal(3, BigDecimal.valueOf(producto.getPrecio()));
                 ps.addBatch();
             }
             ps.executeBatch();
@@ -179,17 +180,17 @@ public class ProveedorDAO {
                 + "JOIN Proveedor_Producto pp ON pp.idProducto = p.id "
                 + "WHERE pp.nitProveedor = ? "
                 + "ORDER BY p.nombre";
-        List<ProveedorProducto> productos = new ArrayList<>();
+        List<ProductoProveedor> productos = new ArrayList<>();
 
         try (PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setString(1, proveedor.getNit());
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    Producto producto = new Producto(
+                    productos.add(new ProductoProveedor(
                             rs.getInt("id"),
                             rs.getString("nombre"),
-                            rs.getInt("idCategoria"));
-                    productos.add(new ProveedorProducto(producto, rs.getDouble("precio")));
+                            rs.getInt("idCategoria"),
+                            rs.getDouble("precio")));
                 }
             }
         }
@@ -205,4 +206,5 @@ public class ProveedorDAO {
                 rs.getString("direccion"),
                 rs.getInt("idCiudad"));
     }
+
 }
