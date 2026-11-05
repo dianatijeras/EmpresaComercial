@@ -212,7 +212,7 @@ public class ReportesPanel extends JPanel {
         combo.setSelectedIndex(0);
     }
 
-    // ---------- Generar ----------
+    //Generar
 
     private void generar() {
         Reporte reporte = (Reporte) cboReporte.getSelectedItem();
@@ -311,7 +311,7 @@ public class ReportesPanel extends JPanel {
         mostrarError("No se pudo abrir el archivo automáticamente. Búsquelo en:\n" + archivo.getAbsolutePath());
     }
 
-    // ---------- Ayudas ----------
+    //Ayudas
 
     // Lo que el usuario eligió en el combo; TODOS (o nada) significa sin filtro
     private Object elegido(JComboBox<Object> combo) {

@@ -25,7 +25,9 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 
-/** Bitácora de entradas y salidas (Auditoría). Solo lectura y solo administrador. */
+/**
+ * Bitácora de entradas y salidas (Auditoría). Solo lectura y solo administrador.
+ */
 public class BitacoraPanel extends JPanel {
 
     private static final DateTimeFormatter FORMATO = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");

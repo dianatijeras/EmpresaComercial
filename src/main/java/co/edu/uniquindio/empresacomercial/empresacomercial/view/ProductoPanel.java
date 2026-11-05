@@ -77,7 +77,7 @@ public class ProductoPanel extends CrudPanel {
         controller.eliminar(idSeleccionado());
     }
 
-    // ---------- Lectura del formulario ----------
+    //Lectura del formulario
 
     // Sin categoría elegida se envía 0 y el controller responde "Seleccione una categoría."
     private int idCategoriaElegida() {

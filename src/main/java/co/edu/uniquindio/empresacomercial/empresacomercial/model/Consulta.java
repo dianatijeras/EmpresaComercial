@@ -27,8 +27,8 @@ public enum Consulta {
             Tipo.SUBCONSULTA, Parametro.NINGUNO),
 
     OFERTAS_SOBRE_EL_PROMEDIO(
-            "Ofertas con precio por encima del promedio de su producto",
-            "Subconsulta que calcula el precio promedio de cada producto y lo compara con cada oferta.",
+            "Proveedores con alguna oferta por encima del promedio de precios",
+            "Subconsulta que calcula el precio promedio de todas las ofertas y busca los proveedores que tienen alguna por encima.",
             Tipo.SUBCONSULTA, Parametro.NINGUNO);
 
     public enum Tipo {JOIN, SUBCONSULTA}

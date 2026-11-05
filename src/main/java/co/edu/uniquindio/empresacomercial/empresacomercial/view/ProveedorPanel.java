@@ -94,7 +94,7 @@ public class ProveedorPanel extends CrudPanel {
         controller.eliminar(nitSeleccionado());
     }
 
-    // ---------- Ayudas ----------
+    //Ayudas
 
     // La llave de Proveedor es el NIT (texto), no un id numérico
     private String nitSeleccionado() {

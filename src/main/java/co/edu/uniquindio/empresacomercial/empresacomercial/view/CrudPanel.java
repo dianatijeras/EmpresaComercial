@@ -2,18 +2,11 @@ package co.edu.uniquindio.empresacomercial.empresacomercial.view;
 
 import co.edu.uniquindio.empresacomercial.empresacomercial.controller.NegocioException;
 
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.ListSelectionModel;
+import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableRowSorter;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.Font;
@@ -22,6 +15,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.HierarchyEvent;
 import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * Panel base para los CRUD: título, formulario, botones (Nuevo, Guardar,
@@ -38,6 +32,13 @@ public abstract class CrudPanel extends JPanel {
     private final String titulo;
     protected final DefaultTableModel modelo;
     protected final JTable tabla;
+
+    private final TableRowSorter<DefaultTableModel> ordenador;
+    private final JTextField txtBuscar = new JTextField(20);
+    private final JLabel lblTitulo = new JLabel();
+    private JComponent formulario;
+    private JPanel botones;
+    private boolean soloLectura = false;
 
     private final JButton btnNuevo = new JButton("Nuevo");
     private final JButton btnGuardar = new JButton("Guardar");
@@ -56,6 +57,9 @@ public abstract class CrudPanel extends JPanel {
             }
         };
         tabla = new JTable(modelo);
+        // El ordenador permite filtrar con el buscador y ordenar con clic en el encabezado
+        ordenador = new TableRowSorter<>(modelo);
+        tabla.setRowSorter(ordenador);
         tabla.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tabla.getSelectionModel().addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting()) {
@@ -64,31 +68,32 @@ public abstract class CrudPanel extends JPanel {
         });
     }
 
-    // ---------- Lo que define cada entidad ----------
+    //Lo que define cada entidad
 
-    /** Una fila por registro, en el mismo orden que las columnas. */
+    //Una fila por registro, en el mismo orden que las columnas
     protected abstract List<Object[]> cargarFilas() throws NegocioException;
 
-    /** Pasa los datos de la fila seleccionada a los campos del formulario. */
+    //Pasa los datos de la fila seleccionada a los campos del formulario.
     protected abstract void llenarFormulario(int fila);
 
-    /** Deja los campos del formulario vacíos. */
+    //Deja los campos del formulario vacíos.
     protected abstract void limpiarFormulario();
 
-    /** Crea el registro si no hay fila seleccionada; si la hay, lo actualiza. */
+    //Crea el registro si no hay fila seleccionada; si la hay, lo actualiza.
     protected abstract void guardar() throws NegocioException;
 
-    /** Elimina el registro de la fila seleccionada. */
+    //Elimina el registro de la fila seleccionada.
     protected abstract void eliminar() throws NegocioException;
 
-    // ---------- Armado ----------
+    //Armado
 
-    /** Se llama al final del constructor de la subclase. */
+    //Se llama al final del constructor de la subclase.
     protected void iniciar(JComponent formulario) {
-        JLabel lblTitulo = new JLabel(titulo);
+        this.formulario = formulario;
+        lblTitulo.setText(titulo);
         lblTitulo.setFont(lblTitulo.getFont().deriveFont(Font.BOLD, 18f));
 
-        JPanel botones = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 8));
+        botones = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 8));
         botones.add(btnNuevo);
         botones.add(Box.createHorizontalStrut(8));
         botones.add(btnGuardar);
@@ -106,7 +111,31 @@ public abstract class CrudPanel extends JPanel {
         arriba.add(botones);
 
         add(arriba, BorderLayout.NORTH);
-        add(new JScrollPane(tabla), BorderLayout.CENTER);
+        // Buscador encima de la tabla
+        JPanel buscador = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        buscador.add(new JLabel("Buscar: "));
+        buscador.add(txtBuscar);
+        JPanel centro = new JPanel(new BorderLayout(0, 8));
+        centro.add(buscador, BorderLayout.NORTH);
+        centro.add(new JScrollPane(tabla), BorderLayout.CENTER);
+        add(centro, BorderLayout.CENTER);
+
+        txtBuscar.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                filtrar();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                filtrar();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                filtrar();
+            }
+        });
 
         btnNuevo.addActionListener(e -> nuevo());
         btnGuardar.addActionListener(e -> accionGuardar());
@@ -125,13 +154,13 @@ public abstract class CrudPanel extends JPanel {
         recargar();
     }
 
-    /** Se ejecuta cada vez que el panel aparece en pantalla. */
+    //se ejecuta cada vez que el panel aparece en pantalla
     protected void alMostrar() {
         recargar();
         nuevo();
     }
 
-    /** Formulario de dos columnas (etiqueta, campo) listo para pasar a iniciar(). */
+    //Formulario de dos columnas (etiqueta, campo) listo para pasar a iniciar().
     protected static JPanel crearFormulario(String[] etiquetas, JComponent[] campos) {
         JPanel panel = new JPanel(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
@@ -150,7 +179,7 @@ public abstract class CrudPanel extends JPanel {
         return izquierda;
     }
 
-    // ---------- Acciones ----------
+    //Acciones
 
     protected void recargar() {
         try {
@@ -170,14 +199,17 @@ public abstract class CrudPanel extends JPanel {
     }
 
     private void alSeleccionar() {
-        int fila = tabla.getSelectedRow();
-        btnEliminar.setEnabled(fila >= 0);
-        if (fila >= 0) {
-            llenarFormulario(fila);
+        int vista = tabla.getSelectedRow();
+        btnEliminar.setEnabled(vista >= 0 && !soloLectura);
+        if (vista >= 0) {
+            llenarFormulario(tabla.convertRowIndexToModel(vista));
         }
     }
 
     private void accionGuardar() {
+        if (soloLectura) {
+            return;
+        }
         try {
             guardar();
             recargar();
@@ -188,7 +220,7 @@ public abstract class CrudPanel extends JPanel {
     }
 
     private void accionEliminar() {
-        if (!haySeleccion()) {
+        if (soloLectura || !haySeleccion()) {
             return;
         }
         int respuesta = JOptionPane.showConfirmDialog(this,
@@ -206,15 +238,41 @@ public abstract class CrudPanel extends JPanel {
         }
     }
 
-    // ---------- Ayudas para las subclases ----------
+    /** Filtra la tabla con el texto del buscador (en cualquier columna, sin distinguir mayúsculas). */
+    private void filtrar() {
+        String texto = txtBuscar.getText().trim();
+        if (texto.isEmpty()) {
+            ordenador.setRowFilter(null);
+        } else {
+            ordenador.setRowFilter(RowFilter.regexFilter("(?iu)" + Pattern.quote(texto)));
+        }
+    }
+
+    /**
+     * Solo lectura: se ocultan el formulario y los botones, y queda el buscador
+     * y la tabla. Es para los usuarios que solo pueden listar y buscar.
+     */
+    public void setSoloLectura(boolean valor) {
+        soloLectura = valor;
+        if (formulario != null) {
+            formulario.setVisible(!valor);
+        }
+        if (botones != null) {
+            botones.setVisible(!valor);
+        }
+        lblTitulo.setText(valor ? titulo + " (solo consulta)" : titulo);
+        btnEliminar.setEnabled(!valor && haySeleccion());
+    }
+
+    //Ayudas para las subclases
 
     protected boolean haySeleccion() {
         return tabla.getSelectedRow() >= 0;
     }
 
-    /** Valor de una columna de la fila seleccionada (la columna 0 suele ser el id). */
+    //Valor de una columna de la fila seleccionada (la columna 0 suele ser el id)
     protected Object valorSeleccionado(int columna) {
-        return modelo.getValueAt(tabla.getSelectedRow(), columna);
+        return modelo.getValueAt(tabla.convertRowIndexToModel(tabla.getSelectedRow()), columna);
     }
 
     protected int idSeleccionado() {

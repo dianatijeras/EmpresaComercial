@@ -35,7 +35,7 @@ public class ConsultaDAO {
                     + "FROM Proveedor pr "
                     + "INNER JOIN Ciudad ci ON ci.id = pr.idCiudad "
                     + "LEFT JOIN Proveedor_Producto pp ON pp.nitProveedor = pr.nit "
-                    + "GROUP BY ci.nombre, pr.nombre "
+                    + "GROUP BY ci.nombre, pr.nit, pr.nombre "
                     + "ORDER BY ci.nombre, pr.nombre";
 
     // JOIN de 5 tablas, con la ciudad como parámetro
@@ -62,14 +62,11 @@ public class ConsultaDAO {
 
     // Subconsulta: cada oferta contra el promedio de su producto
     static final String SQL_OFERTAS_SOBRE_EL_PROMEDIO =
-            "SELECT pr.nombre AS Proveedor, p.nombre AS Producto, pp.precio AS Precio, "
-                    + "(SELECT AVG(x.precio) FROM Proveedor_Producto x WHERE x.idProducto = pp.idProducto) AS PromedioProducto "
-                    + "FROM Proveedor_Producto pp "
-                    + "INNER JOIN Proveedor pr ON pr.nit = pp.nitProveedor "
-                    + "INNER JOIN Producto p ON p.id = pp.idProducto "
-                    + "WHERE pp.precio > "
-                    + "(SELECT AVG(x.precio) FROM Proveedor_Producto x WHERE x.idProducto = pp.idProducto) "
-                    + "ORDER BY p.nombre, pp.precio DESC";
+            "SELECT pr.nombre AS Proveedor, pr.nit AS NIT "
+                    + "FROM Proveedor pr "
+                    + "WHERE pr.nit IN (SELECT pp.nitProveedor FROM Proveedor_Producto pp "
+                    + "WHERE pp.precio > (SELECT AVG(precio) FROM Proveedor_Producto)) "
+                    + "ORDER BY pr.nombre";
 
     /** idParametro solo se usa en las consultas que lo piden (la ciudad). */
     public ResultadoConsulta ejecutar(Consulta consulta, Integer idParametro) throws SQLException {

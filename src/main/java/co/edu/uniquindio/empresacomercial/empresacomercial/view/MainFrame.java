@@ -68,18 +68,22 @@ public class MainFrame extends JFrame {
         mostrar(INICIO);
     }
 
-    // ---------- Pantallas ----------
+    //Pantallas
 
     private void construirContenido() {
         agregar(INICIO, new JLabel("Bienvenido, " + usuario.getNombre(), SwingConstants.CENTER));
 
-        // Cada panel se crea solo si el tipo de usuario puede abrirlo: así no se
-        // hacen consultas innecesarias ni salen errores de permisos al ingresar.
-        if (usuario.getTipoUsuario().puedeModificarDatos()) {
-            agregar(CIUDADES, new CiudadPanel());
-            agregar(CATEGORIAS, new CategoriaPanel());
-            agregar(PRODUCTOS, new ProductoPanel());
-            agregar(PROVEEDORES, new ProveedorPanel());
+        // Las entidades las ven todos los usuarios: quien no puede modificar datos
+        // (el esporádico) las ve en solo lectura, con buscador.
+        boolean puedeModificar = usuario.getTipoUsuario().puedeModificarDatos();
+        agregar(CIUDADES, entidad(new CiudadPanel(), puedeModificar));
+        agregar(CATEGORIAS, entidad(new CategoriaPanel(), puedeModificar));
+        agregar(PRODUCTOS, entidad(new ProductoPanel(), puedeModificar));
+        agregar(PROVEEDORES, entidad(new ProveedorPanel(), puedeModificar));
+
+        // Los productos de cada proveedor (Transacciones) solo los gestiona
+        // quien puede modificar datos.
+        if (puedeModificar) {
             agregar(PROVEEDOR_PRODUCTO, new ProveedorProductoPanel());
         }
 
@@ -96,24 +100,31 @@ public class MainFrame extends JFrame {
         contenido.add(panel, nombre);
     }
 
+    // Deja la pantalla de la entidad en solo lectura si el usuario no puede modificar datos
+    private CrudPanel entidad(CrudPanel panel, boolean puedeModificar) {
+        panel.setSoloLectura(!puedeModificar);
+        return panel;
+    }
+
     public void mostrar(String nombre) {
         cartas.show(contenido, nombre);
     }
 
-    // ---------- Menú (según el tipo de usuario) ----------
+    //Menú (según el tipo de usuario)
 
     private JMenuBar construirMenu() {
         JMenuBar barra = new JMenuBar();
 
+        // Todos ven las entidades (el esporádico en solo lectura, con buscador)
+        JMenu entidades = new JMenu("Entidades");
+        entidades.add(item("Ciudades", CIUDADES));
+        entidades.add(item("Categorías", CATEGORIAS));
+        entidades.add(item("Productos", PRODUCTOS));
+        entidades.add(item("Proveedores", PROVEEDORES));
+        barra.add(entidades);
+
         // Solo administrador y tradicional pueden modificar datos
         if (usuario.getTipoUsuario().puedeModificarDatos()) {
-            JMenu entidades = new JMenu("Entidades");
-            entidades.add(item("Ciudades", CIUDADES));
-            entidades.add(item("Categorías", CATEGORIAS));
-            entidades.add(item("Productos", PRODUCTOS));
-            entidades.add(item("Proveedores", PROVEEDORES));
-            barra.add(entidades);
-
             JMenu transacciones = new JMenu("Transacciones");
             transacciones.add(item("Productos de un proveedor", PROVEEDOR_PRODUCTO));
             barra.add(transacciones);
@@ -148,7 +159,7 @@ public class MainFrame extends JFrame {
         return item;
     }
 
-    // ---------- Salida ----------
+    //Salida
 
     /**
      * Registra la salida en la bitácora y cierra la ventana.

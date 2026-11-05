@@ -190,7 +190,7 @@ public class ProveedorProductoPanel extends JPanel {
         btnQuitar.addActionListener(e -> quitarProducto());
     }
 
-    // ---------- Datos ----------
+    //Datos
 
     // Recarga los dos combos y conserva el proveedor que estaba elegido
     private void recargar() {
@@ -231,7 +231,7 @@ public class ProveedorProductoPanel extends JPanel {
         }
     }
 
-    // ---------- Acciones ----------
+    //Acciones
 
     private void agregarProducto() {
         Proveedor proveedor = proveedorElegido();
@@ -300,7 +300,7 @@ public class ProveedorProductoPanel extends JPanel {
         }
     }
 
-    // ---------- Ayudas ----------
+    //Ayudas
 
     private Proveedor proveedorElegido() {
         return (Proveedor) cboProveedor.getSelectedItem();
